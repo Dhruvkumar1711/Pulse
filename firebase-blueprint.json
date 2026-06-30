@@ -1,0 +1,153 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user profile document detailing settings, timezone, and working hours.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique user UID from Firebase Auth." },
+        "name": { "type": "string", "description": "The user's display name." },
+        "email": { "type": "string", "description": "The user's email address." },
+        "workingHours": {
+          "type": "object",
+          "description": "Defined daily productive working hours.",
+          "properties": {
+            "start": { "type": "string", "description": "Start time in HH:MM format." },
+            "end": { "type": "string", "description": "End time in HH:MM format." }
+          }
+        },
+        "timezone": { "type": "string", "description": "The user's local timezone." }
+      },
+      "required": ["uid", "name", "email"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A productivity task in the todo list.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Task identifier." },
+        "userId": { "type": "string", "description": "The owner's UID." },
+        "title": { "type": "string", "description": "Title of the task." },
+        "description": { "type": "string", "description": "Optional details about the task." },
+        "category": { "type": "string", "description": "Category of the task (e.g., Work, Personal, Hackathon)." },
+        "deadline": { "type": "string", "description": "ISO date-time or YYYY-MM-DD deadline format." },
+        "estimatedMinutes": { "type": "integer", "description": "Time estimate in minutes." },
+        "status": { "type": "string", "enum": ["todo", "in_progress", "done"], "description": "Status of the task." },
+        "priorityScore": { "type": "integer", "description": "AI-prioritized score from 1-100." },
+        "priorityReason": { "type": "string", "description": "Brief explanation of the prioritization." },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation." }
+      },
+      "required": ["id", "userId", "title", "status"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "A long-term objective broken down into milestones.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Goal identifier." },
+        "userId": { "type": "string", "description": "The owner's UID." },
+        "title": { "type": "string", "description": "Title of the goal." },
+        "description": { "type": "string", "description": "Detailed goal description." },
+        "targetDate": { "type": "string", "description": "YYYY-MM-DD format target deadline." },
+        "progressPercent": { "type": "integer", "description": "Overall progress percentage from 0-100." },
+        "milestones": {
+          "type": "array",
+          "description": "Sub-milestones broken down by the goal planner."
+        }
+      },
+      "required": ["id", "userId", "title", "progressPercent"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "A positive routine tracked daily or weekly.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Habit identifier." },
+        "userId": { "type": "string", "description": "The owner's UID." },
+        "name": { "type": "string", "description": "The habit's name." },
+        "frequency": { "type": "string", "enum": ["daily", "weekly"], "description": "How often the habit is checked." },
+        "streak": { "type": "integer", "description": "Current consecutive streak days." },
+        "lastCompletedAt": { "type": "string", "description": "ISO timestamp of last check-in." }
+      },
+      "required": ["id", "userId", "name", "frequency", "streak"]
+    },
+    "Reminder": {
+      "title": "Reminder",
+      "description": "Context-aware warnings/alerts for upcoming deadlines.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Reminder identifier." },
+        "userId": { "type": "string", "description": "The owner's UID." },
+        "taskId": { "type": "string", "description": "The referenced task." },
+        "message": { "type": "string", "description": "Reminder content." },
+        "triggerAt": { "type": "string", "description": "ISO timestamp when reminder triggers." },
+        "type": { "type": "string", "description": "Type of warning (e.g. deadline)." },
+        "sent": { "type": "boolean", "description": "Whether the notification has been surfaced/sent." }
+      },
+      "required": ["id", "userId", "message", "triggerAt", "sent"]
+    },
+    "ScheduleBlock": {
+      "title": "ScheduleBlock",
+      "description": "A focus session block scheduled on the calendar.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Block identifier." },
+        "userId": { "type": "string", "description": "The owner's UID." },
+        "taskId": { "type": "string", "description": "The task linked to this block." },
+        "start": { "type": "string", "description": "ISO date-time start string." },
+        "end": { "type": "string", "description": "ISO date-time end string." }
+      },
+      "required": ["id", "userId", "taskId", "start", "end"]
+    },
+    "Recommendation": {
+      "title": "Recommendation",
+      "description": "Personalized productivity analysis recommendation cards.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Recommendation identifier." },
+        "userId": { "type": "string", "description": "The owner's UID." },
+        "title": { "type": "string", "description": "Card headline." },
+        "message": { "type": "string", "description": "Analysis messaging." },
+        "category": { "type": "string", "description": "focus_time, procrastination, habit_risk, etc." },
+        "type": { "type": "string", "description": "Visual type: info, warning, success." },
+        "dismissed": { "type": "boolean", "description": "Whether dismissed by user." },
+        "createdAt": { "type": "string", "description": "ISO timestamp of generation." }
+      },
+      "required": ["id", "userId", "title", "message", "category", "type", "dismissed"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores core settings and details for each user."
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Stores individual user todo items."
+    },
+    "/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "Stores user productivity goals and milestones."
+    },
+    "/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "Stores habits tracked by users."
+    },
+    "/reminders/{reminderId}": {
+      "schema": "Reminder",
+      "description": "Stores context-aware smart alerts."
+    },
+    "/scheduleBlocks/{blockId}": {
+      "schema": "ScheduleBlock",
+      "description": "Stores planned calendar slot blocks."
+    },
+    "/gcalEvents/{eventId}": {
+      "schema": "object",
+      "description": "Stores synchronized Google Calendar events."
+    },
+    "/recommendations/{recId}": {
+      "schema": "Recommendation",
+      "description": "Stores generated productivity recommendation cards."
+    }
+  }
+}

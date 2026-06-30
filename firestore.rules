@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    match /tasks/{taskId} {
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /goals/{goalId} {
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /habits/{habitId} {
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /reminders/{reminderId} {
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /scheduleBlocks/{blockId} {
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /gcalEvents/{eventId} {
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /recommendations/{recId} {
+      allow read: if request.auth != null && (resource == null || !("userId" in resource.data) || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (resource == null || !("userId" in resource.data) || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource == null || !("userId" in resource.data) || resource.data.userId == request.auth.uid);
+    }
+  }
+}

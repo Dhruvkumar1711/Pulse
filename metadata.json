@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Pulse",
+  "description": "An AI productivity companion that proactively helps users plan, prioritize, and finish tasks before deadlines.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
