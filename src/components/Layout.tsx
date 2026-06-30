@@ -27,7 +27,7 @@ interface LayoutProps {
   user: any;
   userProfile: UserProfile | null;
   reminders: Reminder[];
-  onDismissReminder: (id: string) => void;
+  onDismissReminder: (id: string, forceDismiss?: boolean) => void;
   onClearAllReminders: () => void;
   onLogout: () => void;
   children: React.ReactNode;
@@ -46,7 +46,8 @@ export const Layout: React.FC<LayoutProps> = ({
   children,
 }) => {
   const [isBellOpen, setIsBellOpen] = useState(false);
-  const bellRef = useRef<HTMLDivElement>(null);
+  const desktopBellRef = useRef<HTMLDivElement>(null);
+  const mobileBellRef = useRef<HTMLDivElement>(null);
   
   const [lastOpenedBell, setLastOpenedBell] = useState<string>(() => {
     return localStorage.getItem('pulse_last_opened_bell') || new Date().toISOString();
@@ -57,7 +58,10 @@ export const Layout: React.FC<LayoutProps> = ({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const clickedInsideDesktop = desktopBellRef.current && desktopBellRef.current.contains(target);
+      const clickedInsideMobile = mobileBellRef.current && mobileBellRef.current.contains(target);
+      if (!clickedInsideDesktop && !clickedInsideMobile) {
         setIsBellOpen(false);
       }
     }
@@ -185,7 +189,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
             {/* Notification Bell on Desktop */}
             {user && (
-              <div className="relative" ref={bellRef}>
+              <div className="relative" ref={desktopBellRef}>
                 <NeumorphicButton
                   id="desktop-notification-bell-btn"
                   darkMode={darkMode}
@@ -268,7 +272,7 @@ export const Layout: React.FC<LayoutProps> = ({
                                       </div>
                                     </div>
                                     <button
-                                      onClick={() => onDismissReminder(rem.id)}
+                                      onClick={() => onDismissReminder(rem.id, true)}
                                       className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5"
                                     >
                                       <X className="w-3.5 h-3.5" />
@@ -334,7 +338,7 @@ export const Layout: React.FC<LayoutProps> = ({
       </aside>
  
       {/* Main Panel Frame (Takes up all remaining room) */}
-      <main className="flex-1 flex flex-col p-4 sm:p-6 md:p-8 md:pl-3 pb-24 md:pb-8 overflow-y-auto max-w-5xl mx-auto w-full relative">
+      <main className="flex-1 flex flex-col p-4 sm:p-6 md:p-8 md:pl-3 pb-24 md:pb-8 overflow-y-auto max-w-7xl xl:max-w-[1520px] mx-auto w-full relative">
         {/* Mobile Header (Only visible on sm/mobile) */}
         <header className="flex md:hidden items-center justify-between mb-6 p-1">
           <div className="flex items-center gap-2">
@@ -351,7 +355,7 @@ export const Layout: React.FC<LayoutProps> = ({
           {user && (
             <div className="flex items-center gap-2.5">
               {/* Notification Bell on Mobile */}
-              <div className="relative" ref={bellRef}>
+              <div className="relative" ref={mobileBellRef}>
                 <NeumorphicButton
                   id="mobile-notification-bell-btn"
                   darkMode={darkMode}
@@ -434,7 +438,7 @@ export const Layout: React.FC<LayoutProps> = ({
                                       </div>
                                     </div>
                                     <button
-                                      onClick={() => onDismissReminder(rem.id)}
+                                      onClick={() => onDismissReminder(rem.id, true)}
                                       className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5"
                                     >
                                       <X className="w-3 h-3" />

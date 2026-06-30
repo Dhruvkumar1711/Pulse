@@ -509,12 +509,12 @@ export default function App() {
   };
 
   // --- REMINDERS ENGINE & HANDLERS ---
-  const handleDismissReminder = async (id: string) => {
+  const handleDismissReminder = async (id: string, forceDismiss = false) => {
     if (!user) return;
     const rem = reminders.find(r => r.id === id);
     if (!rem) return;
 
-    if (!rem.sent) {
+    if (!rem.sent && !forceDismiss) {
       // Mark as sent so toast disappears
       if (isLocalMode) {
         const updated = reminders.map(r => r.id === id ? { ...r, sent: true } : r);
@@ -529,15 +529,15 @@ export default function App() {
         }
       }
     } else {
-      // Hide from history by marking as dismissed
+      // Hide from history by marking as dismissed (ensure sent is also true)
       if (isLocalMode) {
-        const updated = reminders.map(r => r.id === id ? { ...r, dismissed: true } : r);
+        const updated = reminders.map(r => r.id === id ? { ...r, dismissed: true, sent: true } : r);
         setReminders(updated);
         localStorage.setItem(`pulse_reminders_${user.uid}`, JSON.stringify(updated));
       } else {
         try {
           const docRef = doc(db, 'reminders', id);
-          await updateDoc(docRef, { dismissed: true });
+          await updateDoc(docRef, { dismissed: true, sent: true });
         } catch (err) {
           console.error("Failed to delete reminder", err);
         }
